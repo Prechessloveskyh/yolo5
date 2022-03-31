@@ -578,7 +578,11 @@ class LoadImagesAndLabels(Dataset):
 
         if labels.size:  # normalized xywh to pixel xyxy format
             labels[:, 1:] = xywhn2xyxy(labels[:, 1:], ratio[0] * w, ratio[1] * h, padw=pad[0], padh=pad[1])
-
+        print(labels)
+        nl = len(labels)  # number of labels
+        if nl:
+            labels[:, 1:5] = xyxy2xywhn(labels[:, 1:5], w=img.shape[1], h=img.shape[0], clip=True, eps=1E-3)
+        nl = len(labels)  # update after albumentations
         img, labels = self.albumentations(img, labels)
 
         # if self.augment:
@@ -589,13 +593,10 @@ class LoadImagesAndLabels(Dataset):
         #                                      shear=hyp['shear'],
         #                                      perspective=hyp['perspective'])
 
-        nl = len(labels)  # number of labels
-        if nl:
-            labels[:, 1:5] = xyxy2xywhn(labels[:, 1:5], w=img.shape[1], h=img.shape[0], clip=True, eps=1E-3)
+
 
         # if self.augment:
         # Albumentations
-        nl = len(labels)  # update after albumentations
 
         # HSV color-space
         # augment_hsv(img, hgain=hyp['hsv_h'], sgain=hyp['hsv_s'], vgain=hyp['hsv_v'])
